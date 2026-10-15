@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - ShopNova</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .order-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--light-gray);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova</a>
+        <div class="nav-links" id="auth-links"></div>
+    </nav>
+
+    <div class="container">
+        <h2>Order History</h2>
+        
+        <div id="orders-container" style="margin-top: 2rem;">
+            <p>Loading your orders...</p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const container = document.getElementById('orders-container');
+
+            try {
+                const orders = await fetchAPI(`/orders/${userId}`, 'GET');
+                
+                if (!orders || orders.length === 0) {
+                    container.innerHTML = '<p>You have no orders yet.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                
+                // Sort by date desc (if not already sorted by backend)
+                orders.sort((a, b) => new Date(b.order.orderDate) - new Date(a.order.orderDate));
+
+                let orderNumber = orders.length;
+
+                for (const o of orders) {
+                    const orderDate = new Date(o.order.orderDate).toLocaleString();
+                    
+                    const card = document.createElement('div');
+                    card.className = 'order-card';
+                    
+                    let itemsHtml = '';
+                    for (const item of o.items) {
+                        try {
+                            const product = await fetchAPI(`/products/${item.productId}`, 'GET');
+                            itemsHtml += `
+                                <div class="order-item-row">
+                                    <div style="display:flex; align-items:center; gap: 1rem;">
+                                        <img src="${product.imageUrl || 'https://via.placeholder.com/40'}" onerror="this.onerror=null;this.src='https://via.placeholder.com/40';" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                        <span>${product.name} (x${item.quantity})</span>
+                                    </div>
+                                    <span>Rs. ${(item.price * item.quantity).toLocaleString()}</span>
+                                </div>
+                            `;
+                        } catch (e) {
+                            itemsHtml += `
+                                <div class="order-item-row">
+                                    <span>Product #${item.productId} (x${item.quantity})</span>
+                                    <span>Rs. ${(item.price * item.quantity).toLocaleString()}</span>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    card.innerHTML = `
+                        <div class="order-header">
+                            <div>
+                                <strong>Order #${orderNumber}</strong>
+                                <span style="font-size: 0.8rem; color: #888; margin-left: 0.5rem;">(ID: ${o.order.id})</span>
+                                <div style="font-size: 0.85rem; color: #888; margin-top: 0.3rem;">Placed on: ${orderDate}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <strong style="color: var(--primary-color); font-size: 1.2rem;">Rs. ${o.order.totalAmount.toLocaleString()}</strong>
+                            </div>
+                        </div>
+                        <div class="order-items-list">
+                            ${itemsHtml}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                    
+                    orderNumber--;
+                }
+            } catch (err) {
+                container.innerHTML = '<p>Failed to load orders.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

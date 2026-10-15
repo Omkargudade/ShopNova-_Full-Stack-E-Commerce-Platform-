@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - ShopNova</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <button id="mobile-filter-toggle" class="btn btn-outline w-100" type="button">Show Filters 🔍</button>
+        <div class="search-layout">
+            <!-- Sidebar Filters -->
+            <aside class="search-sidebar">
+                <div class="filter-group">
+                    <h3 class="filter-title">Price Range</h3>
+                    <div class="price-inputs">
+                        <input type="number" id="filter-min-price" placeholder="Min" min="0">
+                        <span>to</span>
+                        <input type="number" id="filter-max-price" placeholder="Max" min="0">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h3 class="filter-title">Category</h3>
+                    <div id="filter-categories">
+                        <!-- Populated dynamically or hardcoded -->
+                        <label class="filter-option"><input type="checkbox" value="Electronics"> Electronics</label>
+                        <label class="filter-option"><input type="checkbox" value="Fashion"> Fashion</label>
+                        <label class="filter-option"><input type="checkbox" value="Home"> Home</label>
+                        <label class="filter-option"><input type="checkbox" value="Lifestyle"> Lifestyle</label>
+                        <label class="filter-option"><input type="checkbox" value="Mobiles"> Mobiles</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h3 class="filter-title">Brand</h3>
+                    <div id="filter-brands">
+                        <label class="filter-option"><input type="checkbox" value="Apple"> Apple</label>
+                        <label class="filter-option"><input type="checkbox" value="Samsung"> Samsung</label>
+                        <label class="filter-option"><input type="checkbox" value="Sony"> Sony</label>
+                        <label class="filter-option"><input type="checkbox" value="Nike"> Nike</label>
+                        <label class="filter-option"><input type="checkbox" value="Adidas"> Adidas</label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h3 class="filter-title">Availability</h3>
+                    <label class="filter-option"><input type="checkbox" id="filter-instock" value="true"> Include Out of Stock</label>
+                </div>
+
+                <div class="filter-group">
+                    <h3 class="filter-title">Discount</h3>
+                    <label class="filter-option"><input type="radio" name="discount" value="10"> 10% Off or more</label>
+                    <label class="filter-option"><input type="radio" name="discount" value="25"> 25% Off or more</label>
+                    <label class="filter-option"><input type="radio" name="discount" value="50"> 50% Off or more</label>
+                    <label class="filter-option"><input type="radio" name="discount" value="" checked> Any</label>
+                </div>
+
+                <button class="btn btn-primary w-100" id="apply-filters-btn">Apply Filters</button>
+            </aside>
+
+            <!-- Main Results Area -->
+            <main class="search-main">
+                <div class="search-topbar">
+                    <div class="search-query-text" id="search-query-text">Showing all results</div>
+                    <div>
+                        <select id="sort-select" class="sort-select">
+                            <option value="id,desc">Newest Arrivals</option>
+                            <option value="price,asc">Price: Low to High</option>
+                            <option value="price,desc">Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="search-results-container" class="product-grid">
+                    <!-- Products loaded here -->
+                    <p>Loading results...</p>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination-controls">
+                    <!-- Pagination buttons loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/api.js?v=1.1"></script>
+    <script src="js/app.js?v=1.1"></script>
+    <script src="js/wishlist.js?v=1.1"></script>
+    <script src="js/search.js?v=1.1"></script>
+</body>
+</html>

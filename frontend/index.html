@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopNova - Modern E-Commerce</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Everything you need, all in one place.</h1>
+            <p class="text-muted">Shop from trusted sellers across electronics, fashion, and more.</p>
+        </div>
+
+        <h2 style="margin-top: 3rem; margin-bottom: 1rem;">Shop by Categories</h2>
+        
+        <div id="product-list" class="product-grid">
+            <!-- Products loaded here -->
+            <p>Loading products...</p>
+        </div>
+
+        <h2 style="margin-top: 4rem; margin-bottom: 1rem;" id="recommendations-title" class="hidden">Recommended for You</h2>
+        <div id="recommendations-list" class="product-grid hidden">
+            <!-- Recommendations loaded here -->
+        </div>
+    </div>
+
+    <script src="js/api.js?v=1.1"></script>
+    <script src="js/app.js?v=1.1"></script>
+    <script src="js/wishlist.js?v=1.1"></script>
+    <script src="js/chat.js?v=1.1"></script>
+    <script>
+        const renderStars = (rating = 0) => {
+            const rounded = Math.round(Number(rating) || 0);
+            return `<span class="stars">${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}</span>`;
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productList = document.getElementById('product-list');
+            try {
+                const products = await fetchAPI('/products', 'GET');
+                renderProducts(products, productList);
+            } catch (err) {
+                productList.innerHTML = '<p>Failed to load products.</p>';
+            }
+
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                try {
+                    const recs = await fetchAPI(`/recommendations/${userId}`, 'GET');
+                    if(recs && recs.length > 0) {
+                        document.getElementById('recommendations-title').classList.remove('hidden');
+                        const recList = document.getElementById('recommendations-list');
+                        recList.classList.remove('hidden');
+                        renderProducts(recs, recList);
+                    }
+                } catch(e) {
+                    console.error("Failed to load recommendations", e);
+                }
+            }
+        });
+
+        function renderProducts(products, container) {
+            container.innerHTML = '';
+            if (!Array.isArray(products)) return;
+            products.forEach(p => {
+                if (p == null || p.id == null) return;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                const goToProduct = () => {
+                    window.location.href = `product.html?id=${encodeURIComponent(String(p.id))}`;
+                };
+                card.addEventListener('click', goToProduct);
+
+                card.innerHTML = `
+                    <div style="position: relative;">
+                        <button class="wishlist-btn" type="button" aria-label="Add to Wishlist">
+                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </button>
+                        <img src="${p.imageUrl || 'https://via.placeholder.com/250x200'}" onerror="this.onerror=null;this.src='https://via.placeholder.com/250x200';" alt="${p.name}" class="product-img">
+                    </div>
+                    <div class="product-category">${p.category || 'General'}</div>
+                    <h3 class="product-title">${p.name}</h3>
+                    <div class="product-rating">
+                        ${renderStars(p.averageRating)}
+                        <span class="rating-count">(${p.reviewCount || 0})</span>
+                    </div>
+                    <div class="product-price">Rs. ${Number(p.price).toLocaleString()}</div>
+                    <button type="button" class="btn btn-primary mt-auto btn-view-details">View Details</button>
+                `;
+
+                const heartBtn = card.querySelector('.wishlist-btn');
+                initProductCardWishlist(p.id, heartBtn);
+
+                heartBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleWishlist(p.id, heartBtn);
+                });
+
+                const btn = card.querySelector('.btn-view-details');
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    goToProduct();
+                });
+
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

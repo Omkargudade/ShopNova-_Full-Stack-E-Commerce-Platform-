@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders - ShopNova</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--text-color);
+        }
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-shipped { background: #d1ecf1; color: #0c5460; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova Admin</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="admin.html">📦 Manage Products</a>
+            <a href="admin-orders.html" class="active">📜 Manage Orders</a>
+            <a href="admin-users.html">👥 Manage Users</a>
+            <a href="admin-reviews.html">💬 Manage Reviews</a>
+            <a href="index.html">🏠 View Site</a>
+            <div style="margin-top: auto; padding: 1rem;">
+                <button onclick="logout()" class="btn btn-outline w-100" style="color: #ff4d4d; border-color: #ff4d4d;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Order Management</h2>
+            </div>
+            
+            <div class="admin-layout">
+                <div class="admin-table-card" style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Customer Details</th>
+                                <th>Total (Rs.)</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-order-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin-orders.js"></script>
+</body>
+</html>

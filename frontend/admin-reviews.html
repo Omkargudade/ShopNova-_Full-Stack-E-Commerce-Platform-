@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reviews - ShopNova Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .stars-gold {
+            color: #f5b301;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .review-text {
+            max-width: 400px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova Admin</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="admin.html">📦 Manage Products</a>
+            <a href="admin-orders.html">📜 Manage Orders</a>
+            <a href="admin-users.html">👥 Manage Users</a>
+            <a href="admin-reviews.html" class="active">💬 Manage Reviews</a>
+            <a href="index.html">🏠 View Site</a>
+            <div style="margin-top: auto; padding: 1rem;">
+                <button onclick="logout()" class="btn btn-outline w-100" style="color: #ff4d4d; border-color: #ff4d4d;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <h2 style="margin-bottom: 2rem;">Review Management</h2>
+
+            <div class="admin-table-card" style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Review ID</th>
+                            <th>Product ID</th>
+                            <th>Customer</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-review-list">
+                        <!-- Populated by admin-reviews.js -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin-reviews.js"></script>
+</body>
+</html>

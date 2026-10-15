@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - ShopNova Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light-gray);
+            background: var(--white);
+            color: var(--text-color);
+        }
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+        .status-active {
+            color: #28a745;
+        }
+        .status-blocked {
+            color: #dc3545;
+        }
+        .btn-toggle-block {
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova Admin</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="admin.html">📦 Manage Products</a>
+            <a href="admin-orders.html">📜 Manage Orders</a>
+            <a href="admin-users.html" class="active">👥 Manage Users</a>
+            <a href="admin-reviews.html">💬 Manage Reviews</a>
+            <a href="index.html">🏠 View Site</a>
+            <div style="margin-top: auto; padding: 1rem;">
+                <button onclick="logout()" class="btn btn-outline w-100" style="color: #ff4d4d; border-color: #ff4d4d;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+                <h2>User Management</h2>
+                <div class="search-box">
+                    <input type="text" id="userSearch" placeholder="Search by name or email..." oninput="debounceSearch()">
+                </div>
+            </div>
+
+            <div class="admin-table-card" style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-list">
+                        <!-- Populated by admin-users.js -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin-users.js"></script>
+</body>
+</html>

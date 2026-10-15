@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - ShopNova</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .product-detail-container {
+            display: flex;
+            gap: 3rem;
+            margin-top: 2rem;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        .product-detail-img {
+            flex: 1;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            object-fit: cover;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-info h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .product-info .price {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .product-info .desc {
+            margin-bottom: 2rem;
+            color: #555;
+            line-height: 1.8;
+        }
+        @media (max-width: 768px) {
+            .product-detail-container {
+                flex-direction: column;
+                gap: 1.5rem;
+                padding: 1.25rem;
+            }
+            .product-detail-img {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova</a>
+        <div class="nav-links" id="auth-links"></div>
+    </nav>
+
+    <div class="container">
+        <div id="product-container">
+            <p>Loading product details...</p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/wishlist.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        const renderStars = (rating = 0) => {
+            const rounded = Math.round(Number(rating) || 0);
+            return `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`;
+        };
+
+        const escapeHTML = (value = '') => {
+            const div = document.createElement('div');
+            div.textContent = value;
+            return div.innerHTML;
+        };
+
+        const formatDate = (value) => {
+            if (!value) return '';
+            return new Date(value).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        };
+
+        async function loadReviews(productId) {
+            const reviewsContainer = document.getElementById('reviews-container');
+            const ratingSummary = document.getElementById('rating-summary');
+            if (!reviewsContainer || !ratingSummary) return;
+
+            try {
+                const [reviewsRaw, average] = await Promise.all([
+                    fetchAPI(`/reviews/${productId}`, 'GET'),
+                    fetchAPI(`/reviews/average/${productId}`, 'GET')
+                ]);
+
+                const reviews = Array.isArray(reviewsRaw) ? reviewsRaw : [];
+
+                const averageRating = Number(average?.averageRating ?? 0) || 0;
+                ratingSummary.innerHTML = `
+                    <span class="stars" aria-label="${averageRating.toFixed(1)} out of 5 stars">${renderStars(averageRating)}</span>
+                    <span class="rating-meta">${averageRating.toFixed(1)} / 5 (${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'})</span>
+                `;
+
+                if (!reviews.length) {
+                    reviewsContainer.innerHTML = '<p class="review-empty">No reviews yet. Be the first to share your thoughts.</p>';
+                    return;
+                }
+
+                reviewsContainer.innerHTML = reviews.map(review => `
+                    <article class="review-item">
+                        <div class="review-head">
+                            <span class="review-author">${escapeHTML(review.userName)}</span>
+                            <span class="review-date">${formatDate(review.createdAt)}</span>
+                        </div>
+                        <div class="stars" aria-label="${review.rating} out of 5 stars">${renderStars(review.rating)}</div>
+                        <p class="review-comment">${escapeHTML(review.comment || '')}</p>
+                    </article>
+                `).join('');
+            } catch (err) {
+                reviewsContainer.innerHTML = '<p class="review-message error">Failed to load reviews.</p>';
+            }
+        }
+
+        function getProductIdFromLocation() {
+            const fromQuery = new URLSearchParams(window.location.search).get('id');
+            if (fromQuery != null && String(fromQuery).trim() !== '') {
+                return String(fromQuery).trim();
+            }
+            const path = (window.location.pathname || '').replace(/\/+$/, '');
+            const segmentMatch = path.match(/\/product(?:\.html)?\/(\d+)$/i);
+            if (segmentMatch) return segmentMatch[1];
+            const hash = (window.location.hash || '').replace(/^#/, '').trim();
+            if (/^\d+$/.test(hash)) return hash;
+            return null;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productId = getProductIdFromLocation();
+            const container = document.getElementById('product-container');
+
+            if (!productId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const p = await fetchAPI(`/products/${encodeURIComponent(productId)}`, 'GET');
+                container.innerHTML = `
+                    <div class="product-detail-container">
+                        <img src="${p.imageUrl || 'https://via.placeholder.com/500'}" onerror="this.onerror=null;this.src='https://via.placeholder.com/500';" class="product-detail-img" alt="${p.name}">
+                        <div class="product-info">
+                            <div class="product-category" style="margin-bottom: 0.5rem; text-transform: uppercase; color: #888;">${p.category || 'General'}</div>
+                            <h1>${p.name}</h1>
+                            <div class="price">Rs. ${Number(p.price).toLocaleString()}</div>
+                            <div id="rating-summary" class="rating-summary">
+                                <span class="stars">☆☆☆☆☆</span>
+                                <span class="rating-meta">Loading rating...</span>
+                            </div>
+                            <div class="desc">${p.description || 'No description available for this product.'}</div>
+                            <div style="margin-bottom: 1rem; color: ${p.stock > 0 ? 'green' : 'red'};">${p.stock > 0 ? 'In Stock ('+p.stock+' available)' : 'Out of Stock'}</div>
+                            
+                            <div style="display: flex; gap: 1rem; align-items: center; margin-top: 2rem;">
+                                <input type="number" id="qty" value="1" min="1" max="${p.stock}" style="width: 70px; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+                                <button class="btn btn-primary" onclick="addToCart(${p.id}, document.getElementById('qty').value)" ${p.stock === 0 ? 'disabled' : ''}>Add to Cart</button>
+                                <button id="product-wishlist-btn" class="wishlist-btn" style="position: static; display: flex; align-items: center; justify-content: center; width: 45px; height: 45px;" type="button" aria-label="Add to Wishlist">
+                                    <svg viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <section class="reviews-panel" aria-label="Product reviews">
+                        <div class="reviews-list">
+                            <h2>Customer Reviews</h2>
+                            <div id="reviews-container">
+                                <p class="review-empty">Loading reviews...</p>
+                            </div>
+                        </div>
+                        <form id="review-form" class="review-form-card">
+                            <h2>Add a Review</h2>
+                            <div id="review-message" class="review-message"></div>
+                            <div class="form-group">
+                                <label for="review-rating">Rating</label>
+                                <select id="review-rating" name="rating" required>
+                                    <option value="5">5 - Excellent</option>
+                                    <option value="4">4 - Good</option>
+                                    <option value="3">3 - Average</option>
+                                    <option value="2">2 - Poor</option>
+                                    <option value="1">1 - Bad</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="review-comment">Comment</label>
+                                <textarea id="review-comment" name="comment" rows="4" placeholder="What did you like or dislike?" required></textarea>
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit">Submit Review</button>
+                        </form>
+                    </section>
+                `;
+
+                document.getElementById('review-form').addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    const userId = localStorage.getItem('userId');
+                    const userName = localStorage.getItem('userName');
+                    
+                    if (!userId) {
+                        if (window.ShopNovaUI) {
+                            ShopNovaUI.showToast('Please login to add a review', 'warning');
+                            ShopNovaUI.playSound('warning');
+                        } else {
+                            alert('Please login to add a review.');
+                        }
+                        setTimeout(() => window.location.href = 'login.html', 1500);
+                        return;
+                    }
+
+                    const message = document.getElementById('review-message');
+                    const submitButton = event.target.querySelector('button[type="submit"]');
+
+                    const review = {
+                        productId: Number(productId),
+                        userName: userName || 'Anonymous User',
+                        rating: Number(document.getElementById('review-rating').value),
+                        comment: document.getElementById('review-comment').value.trim()
+                    };
+
+                    message.className = 'review-message';
+                    message.textContent = '';
+                    submitButton.disabled = true;
+
+                    try {
+                        await fetchAPI('/reviews', 'POST', review);
+                        event.target.reset();
+                        
+                        if (window.ShopNovaUI) {
+                            ShopNovaUI.showToast('Review submitted successfully!', 'success');
+                            ShopNovaUI.playSound('success');
+                        } else {
+                            message.className = 'review-message success';
+                            message.textContent = 'Review submitted successfully.';
+                        }
+                        
+                        await loadReviews(productId);
+                    } catch (err) {
+                        if (window.ShopNovaUI) {
+                            ShopNovaUI.showToast(err.message || 'Failed to submit review', 'error');
+                            ShopNovaUI.playSound('error');
+                        } else {
+                            message.className = 'review-message error';
+                            message.textContent = err.message || 'Failed to submit review.';
+                        }
+                    } finally {
+                        submitButton.disabled = false;
+                    }
+                });
+
+                await loadReviews(productId);
+
+                // Initialize Wishlist Button
+                const heartBtn = document.getElementById('product-wishlist-btn');
+                if (heartBtn && window.initProductCardWishlist) {
+                    initProductCardWishlist(p.id, heartBtn);
+                    heartBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (window.toggleWishlist) {
+                            toggleWishlist(p.id, heartBtn);
+                        }
+                    });
+                }
+
+                // Log view activity
+                logActivity(productId, 'VIEW');
+
+            } catch (err) {
+                container.innerHTML = '<p>Failed to load product details.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

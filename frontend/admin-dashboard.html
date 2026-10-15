@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ShopNova</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">ShopNova Admin</a>
+        <div class="nav-links" id="auth-links">
+            <!-- Populated by app.js -->
+        </div>
+    </nav>
+
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <a href="admin-dashboard.html" class="active">📊 Dashboard</a>
+            <a href="admin.html">📦 Manage Products</a>
+            <a href="admin-orders.html">📜 Manage Orders</a>
+            <a href="admin-users.html">👥 Manage Users</a>
+            <a href="admin-reviews.html">💬 Manage Reviews</a>
+            <a href="index.html">🏠 View Site</a>
+            <div style="margin-top: auto; padding: 1rem;">
+                <button onclick="logout()" class="btn btn-outline w-100" style="color: #ff4d4d; border-color: #ff4d4d;">Logout</button>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <h2 style="margin-bottom: 2rem;">Dashboard Overview</h2>
+            
+            <div class="dashboard-cards">
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <div class="stat-value" id="stat-revenue">Rs. 0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Orders</h3>
+                    <div class="stat-value" id="stat-orders">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Products</h3>
+                    <div class="stat-value" id="stat-products">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="stat-value" id="stat-users">0</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3 style="margin-bottom: 1rem;">Revenue Overview</h3>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 style="margin-bottom: 1rem;">Order Status</h3>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-container" style="margin-top: 2rem;">
+                <!-- Recent Orders Widget -->
+                <div class="chart-card" style="overflow-x: auto;">
+                    <h3 style="margin-bottom: 1.2rem;">Recent Orders</h3>
+                    <table class="admin-table" style="box-shadow: none; border-radius: 0;">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer ID</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-orders-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Low Stock Alerts Widget -->
+                <div class="chart-card">
+                    <h3 style="margin-bottom: 1.2rem; color: #dc3545; display: flex; align-items: center; gap: 0.5rem;">
+                        ⚠️ Low Stock Alerts
+                    </h3>
+                    <div id="low-stock-list" style="display: flex; flex-direction: column; gap: 0.8rem; max-height: 280px; overflow-y: auto; padding-right: 0.5rem;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

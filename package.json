@@ -1,0 +1,18 @@
+{
+  "name": "shopnova-ecommerce",
+  "version": "1.0.0",
+  "description": "ShopNova AI-Powered E-Commerce Platform - Full Stack VS Code Project",
+  "scripts": {
+    "install:frontend": "cd frontend && npm install",
+    "install:express": "cd express-backend && npm install",
+    "install-all": "npm install && npm run install:frontend && npm run install:express",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:express": "cd express-backend && npm run dev",
+    "dev:java": "concurrently \"npm run dev:frontend\" \"cd backend && .\\mvnw.cmd spring-boot:run\"",
+    "dev:node": "concurrently \"npm run dev:frontend\" \"npm run dev:express\"",
+    "start": "cd express-backend && node server.js"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Frontend for AI E-commerce project",
+  "main": "index.html",
+  "scripts": {
+    "dev": "browser-sync start --config bs-config.js"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.2"
+  }
+}
